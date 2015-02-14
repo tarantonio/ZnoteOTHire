@@ -124,7 +124,7 @@ function support_list() {
 		for ($i = 0; $i < count($staffs); $i++) {
 			// $staffs[$i]['']
 			if ($TFS == 'OTH' || $TFS == 'TFS_10') {
-				$player = mysql_select_single("SELECT `group_id` FROM `players` WHERE `account_id` ='". $staffs[$i]['account_id'] ."';");
+				$player = mysql_select_single("SELECT `group_id` FROM `players` WHERE `name` ='". $staffs[$i]['name'] ."';");
 				$staffs[$i]['group_id'] = $player['group_id'];
 				if ($TFS == 'TFS_10') {
 					// Fix online status on TFS 1.0
@@ -304,7 +304,8 @@ function guild_new_leader($new_leader, $gid) {
 // Returns $gid of a guild leader($cid).
 function guild_leader_gid($leader) {
 	$leader = (int)$leader;
-	return mysql_select_single("SELECT `id` FROM `guilds` WHERE `owner_id`='$leader';");
+	$data = mysql_select_single("SELECT `id` FROM `guilds` WHERE `owner_id`='$leader';");
+	return $data['id'];
 }
 
 // Returns guild leader(charID) of a guild. (parameter: guild_ID)
@@ -949,7 +950,7 @@ function user_account_id_from_name($id) {
 function user_account_add_premdays($accid, $days) { 
     $accid = (int)$accid; 
     $days = (int)$days; 
-    $tmp = mysql_result(mysql_query("SELECT `premend` FROM `accounts` WHERE `id`='$accid';"), 0, 'premend'); 
+    $tmp = mysql_select_single("SELECT `premend` FROM `accounts` WHERE `id`='$accid';")['premend'];
     if($tmp == 0) 
     { 
         $tmp = time() + ($days * 24 * 60 * 60); 
@@ -958,7 +959,7 @@ function user_account_add_premdays($accid, $days) {
     { 
         $tmp = $tmp + ($days * 24 * 60 * 60); 
     } 
-    mysql_query("UPDATE `accounts` SET `premend` = '$tmp' WHERE `id` = '$accid'"); 
+ mysql_update("UPDATE `accounts` SET `premend`='$tmp' WHERE `id`='$accid'");
 }
 
 // Name = char name. Changes from male to female & vice versa.
@@ -1122,9 +1123,9 @@ function user_create_character($character_data) {
 		'guildnick' => '',
 		'lastlogout' => 0,
 		'direction' => 0,
-		'loss_experience' => 10,
-		'loss_mana' => 10,
-		'loss_skills' => 10,
+		'loss_experience' => 100,
+		'loss_mana' => 100,
+		'loss_skills' => 100,
 		'loss_items' => 10,
 		'online' => 0,
 		'balance' => 0
